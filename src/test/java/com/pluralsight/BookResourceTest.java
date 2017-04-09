@@ -1,6 +1,7 @@
 package com.pluralsight;
 
 import org.glassfish.jersey.test.JerseyTest;
+import org.glassfish.jersey.test.TestProperties;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -11,10 +12,9 @@ import java.util.Collection;
 public class BookResourceTest extends JerseyTest {
 
     protected Application configure() {
-//        enable(TestProperties.LOG_TRAFFIC);
-//        enable(TestProperties.DUMP_ENTITY);
+        enable(TestProperties.LOG_TRAFFIC);
+        enable(TestProperties.DUMP_ENTITY);
         final BookDao dao = new BookDao();
-
         return new BookApplication(dao);
     }
 
@@ -30,6 +30,7 @@ public class BookResourceTest extends JerseyTest {
     @Test
     public void testGetBooks() {
         Collection<Book> response = target("books").request().get(new GenericType<Collection<Book>>(){});
+        System.out.printf("books......"+ ((Book)((java.util.ArrayList)response).get(0)).getPublished().getTime());
         Assert.assertEquals(2, response.size());
     }
 }

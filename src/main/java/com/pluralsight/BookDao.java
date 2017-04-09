@@ -8,6 +8,7 @@ import java.util.Map;
 public class BookDao {
 
     private Map<String, Book> books;
+    private Date pubDate = new Date();
 
     BookDao(){
         books = new HashMap<String, Book>();
