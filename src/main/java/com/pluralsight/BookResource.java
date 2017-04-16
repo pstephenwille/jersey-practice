@@ -1,6 +1,10 @@
 package com.pluralsight;
 
+import org.glassfish.jersey.server.ManagedAsync;
+
 import javax.ws.rs.*;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.Collection;
@@ -28,8 +32,9 @@ public class BookResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Book addBook(Book book) {
-        return (dao.addBook(book));
+    @ManagedAsync
+    public void addBook(Book book, @Suspended AsyncResponse response) {
+        response.resume(dao.addBook(book));
     }
 }
 
