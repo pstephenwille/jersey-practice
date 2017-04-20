@@ -1,16 +1,27 @@
 package com.pluralsight;
 
-import java.util.Date;
+import com.fasterxml.jackson.annotation.*;
 
-public class Book  {
+import javax.validation.constraints.NotNull;
+import java.util.Date;
+import java.util.HashMap;
+
+@JsonPropertyOrder({"id"})
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class Book {
+    @NotNull(message = "author is required")
     private String author;
     private Date published;
+
+    @NotNull(message = "title is required")
     private String title;
-    private String isbn;
+    //    private String isbn;@JsonIgnoreProperties(ignoreUnknown = true)
+
     private String id;
 
-
-//    public Book(){}
+    private HashMap<String, Object> extras = new HashMap<String, Object>();
+/*
 
     public String getIsbn() {
         return isbn;
@@ -19,6 +30,7 @@ public class Book  {
     public void setIsbn(String isbn) {
         this.isbn = isbn;
     }
+*/
 
     public String getId() {
         return id;
@@ -51,6 +63,17 @@ public class Book  {
 
     public void setAuthor(String author) {
         this.author = author;
+    }
+
+
+    @JsonAnyGetter
+    public HashMap<String, Object> getExtras() {
+        return extras;
+    }
+
+    @JsonAnySetter
+    public void set(String key, Object value) {
+        this.extras.put(key, value);
     }
 
 }
