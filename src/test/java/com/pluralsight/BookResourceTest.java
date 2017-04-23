@@ -2,6 +2,7 @@ package com.pluralsight;
 
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.glassfish.jersey.test.TestProperties;
@@ -9,14 +10,16 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Application;
+import javax.ws.rs.core.EntityTag;
+import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
@@ -34,8 +37,8 @@ public class BookResourceTest extends JerseyTest {
     }
 
 
-    protected HashMap<String,Object> toHashMap(Response response) {
-        return(response.readEntity(new GenericType<HashMap<String,Object>>() {}));
+    protected HashMap<String, Object> toHashMap(Response response) {
+        return (response.readEntity(new GenericType<HashMap<String, Object>>() {}));
     }
 
 
@@ -47,22 +50,21 @@ public class BookResourceTest extends JerseyTest {
 
 
     protected Response addBook(String author, String title, Date published, String isbn, String... extras) {
-        HashMap<String,Object> book = new HashMap<String,Object>();
-        book.put("author",author);
-        book.put("title",title);
-        book.put("published",published);
-        book.put("isbn",isbn);
+        HashMap<String, Object> book = new HashMap<String, Object>();
+        book.put("author", author);
+        book.put("title", title);
+        book.put("published", published);
+        book.put("isbn", isbn);
         if (extras != null) {
             int count = 1;
             for (String s : extras) {
-                book.put("extra"+ count++, s);
+                book.put("extra" + count++, s);
             }
         }
 
-        Entity<HashMap<String,Object>> bookEntity = Entity.entity(book, MediaType.APPLICATION_JSON_TYPE);
-        return(target("books").request().post(bookEntity));
+        Entity<HashMap<String, Object>> bookEntity = Entity.entity(book, MediaType.APPLICATION_JSON_TYPE);
+        return (target("books").request().post(bookEntity));
     }
-
 
 //    protected Response addBook(String author, String title, Date published, String isbn) {
 //        Book book = new Book();
@@ -103,8 +105,8 @@ public class BookResourceTest extends JerseyTest {
     @Test
     public void testGetBooks() {
 //        Collection<Book> response = target("books").request().get(new GenericType<Collection<Book>>(){});
-        Collection< HashMap<String, Object> > response = target("books").request().get(
-                new GenericType< Collection<HashMap<String, Object>> >(){} );
+        Collection<HashMap<String, Object>> response = target("books").request().get(
+            new GenericType<Collection<HashMap<String, Object>>>() {});
         assertEquals(2, response.size());
     }
 
@@ -113,10 +115,10 @@ public class BookResourceTest extends JerseyTest {
         Response response = addBook("author", "title", new Date(), "1111", "hello world", "woot");
         Assert.assertEquals(200, response.getStatus());
 
-        HashMap<String,Object> book = toHashMap(response);
+        HashMap<String, Object> book = toHashMap(response);
         Assert.assertNotNull(book.get("id"));
-        Assert.assertEquals(book.get("extra1"),"hello world");
-        Assert.assertEquals(book.get("extra2"),"woot");
+        Assert.assertEquals(book.get("extra1"), "hello world");
+        Assert.assertEquals(book.get("extra2"), "woot");
     }
 
 
@@ -125,4 +127,24 @@ public class BookResourceTest extends JerseyTest {
         Response response = addBook(null, "title", new Date(), "5555");
         assertEquals(400, response.getStatus());
     }
+
+    @Test
+    public void BookNotFoundWithMessage() {
+        Response response = target("books").path("1").request().get();
+        assertEquals(404, response.getStatus());
+    }
+
+    @Test
+    public void BookEntityTagNotModified() {
+        EntityTag entityTag = target("books").path(book1_id).request().get().getEntityTag();
+        assertNotNull(entityTag);
+
+        Response response = target("books").path(book1_id)
+            .request()
+            .header("If-None-Match", entityTag)
+            .get();
+        assertEquals(304, response.getStatus());
+    }
 }
+
+

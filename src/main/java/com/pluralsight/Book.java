@@ -1,16 +1,21 @@
 package com.pluralsight;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.HashMap;
+
+import javax.validation.constraints.NotNull;
 
 @JsonPropertyOrder({"id"})
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Book {
-    @NotNull(message = "author is required")
+    @NotNull( message = "author is required")
     private String author;
     private Date published;
 

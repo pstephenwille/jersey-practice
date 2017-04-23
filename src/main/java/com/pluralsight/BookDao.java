@@ -38,9 +38,13 @@ public class BookDao {
     }
 
 
+    Book getBook(String id) throws BookNotFoundException {
+        if (books.containsKey(id)) {
+            return (books.get(id));
+        } else {
+            throw new BookNotFoundException("BOOK " + id + " is not found");
+        }
 
-    Book getBook(String id) {
-        return(books.get(id));
     }
     ListenableFuture<Book> getBookAsync(final String id) {
         ListenableFuture<Book> future = service.submit(new Callable<Book>() {
